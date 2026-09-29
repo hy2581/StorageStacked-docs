@@ -1,10 +1,10 @@
-# coralnpu_StorageStacked/integration：阅读导航
+# CoralNPU：存储接入代码怎么读
 
-本目录连接计算平台与独立的 axi_StorageStacked。
-推荐先看构建文件和入口，再看 storage 的装配，最后看 axi_master 的请求处理。
+这里的代码负责把计算设备的读写请求交给 `axi_StorageStacked`，再把存储返回的数据交还设备。
+建议先看程序从哪里启动，再看模块怎么连接，最后看一笔请求怎样发送和返回。
 .hh 定义数据与接口，.cc 负责具体行为。本目录通过独立 SystemC 运行 CoralNPU，没有 gem5 对象装配步骤。
 
-## 逐文件入口
+## 按文件找说明
 
 | 文件 | 作用 |
 | --- | --- |
@@ -16,7 +16,7 @@
 | [axi_master.hh.md](axi_master.hh.md) | 声明请求状态、在途队列和驱动接口 |
 | [axi_master.cc.md](axi_master.cc.md) | 实现请求到 AXI 的转换与响应返回 |
 
-## 输入和输出
+## 输入和结果
 
 输入：resolved.json、NPU 用户 ELF、原生设备发出的 16 字节请求。
 输出：AXI 五通道信号、回送 NPU 的真实返回数据，以及完成记录、CSV 和波形。
@@ -32,7 +32,7 @@ flowchart LR
 
 用户负载见 [user 导航](../user/README.md)，平台构建见 [build.sh.md](../build.sh.md)。
 
-## 先回答四个问题，再读状态机
+## 先弄清这四件事
 
 | 问题 | 本目录中的位置 |
 |---|---|
@@ -48,8 +48,8 @@ flowchart LR
 设备侧以 16 字节块发出原生请求，适配器保留设备 ID 和序号，
 再为传输分配 AXI ID。两类编号服务于不同接口，响应要准确关联回原设备请求。
 
-## 把一个问题缩小到一次握手
+## 怎样定位一次具体读写
 
 先找上游记录的地址、方向、ID 与时间，再看 AXI 的地址握手和 B/R 返回。
 不要一开始就阅读整份大 VCD。先用 CSV 找到目标时间段，再放大波形。
-关于 VALID/READY、TLM 和字节掩码的基础读法见 [项目入门](../../00-先把项目跑懂.md)。
+如果不熟悉 `VALID/READY`，先看 [AXI 输入说明](https://github.com/hy2581/axi_StorageStacked/blob/main/docs/INPUTS.md) 中的五类信号和接收条件。

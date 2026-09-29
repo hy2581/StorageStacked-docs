@@ -1,15 +1,15 @@
-# CMakeLists.txt：解释版
+# CMakeLists.txt：仿真器怎样编译
 
-对应原文件：[coralnpu_StorageStacked/integration/CMakeLists.txt](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/CMakeLists.txt)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/integration/CMakeLists.txt](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/CMakeLists.txt)。
 
-定义独立 SystemC 仿真器 coralnpu_sim 的编译与链接方式。
+这份清单告诉 CMake：仿真器要编译哪些文件，还要连接哪些库。
 
 ## 输入与输出
 
 输入是本目录的 C++ 桥接代码、CoralNPU 原生运行库、公共 AXI 存储工程，以及上层构建器传入的依赖路径和链路参数。
 输出是 `coralnpu_sim`；用户的 `program.elf` 由用户项目 Makefile 另行编译。
 
-## 按文件顺序解释
+## 构建文件按什么顺序处理
 
 | 配置或命令 | 作用 |
 | --- | --- |

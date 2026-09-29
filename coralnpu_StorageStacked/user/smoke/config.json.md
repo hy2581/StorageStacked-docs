@@ -1,22 +1,22 @@
-# config.json：解释版
+# config.json：这次运行选什么参数
 
-对应原文件：[coralnpu_StorageStacked/user/smoke/config.json](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/smoke/config.json)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/user/smoke/config.json](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/smoke/config.json)。
 
-SMOKE 的统一配置入口，描述负载、计算设备、AXI、UCIe 和存储模型。
+在这里设置加一程序的输入值，以及设备和存储的运行参数。
 
 ## 输入与输出
 
 输入是用户填写的 JSON 参数。`run.sh` 保存本次配置为 `result/运行目录/input.json`，
 编译阶段据此生成 `project_config.h`，解析阶段生成 `resolved.json`。
-仿真器读取解析后的结构，校验器读取输入快照和真实返回的数据。
+仿真器读取解析后的结构，校验器读取这次运行保存的配置和存储实际返回的数据。
 
 保存这个文件只是在磁盘上保存配置；只有随后执行编译好的程序，才会发生模拟内存读写。
 
-## 当前全部参数
+## 这里能改哪些参数
 
 | 字段 | 当前值 | 含义 |
 | --- | --- | --- |
-| `program.type` | `"smoke"` | 负载类型；用于生成编译配置和选择结果校验器。程序源码由 Makefile 指定。 |
+| `program.type` | `"smoke"` | 任务类型；用于生成编译配置和选择结果校验器。程序源码由 Makefile 指定。 |
 | `program.input` | `41` | SMOKE 的 uint32 输入；期望结果为输入加 1，按 32 位无符号数回绕。 |
 | `npu.clock_mhz` | `500` | CoralNPU 时钟频率，单位 MHz。 |
 | `axi.period_ns` | `2` | AXI 时钟周期，单位 ns；2 ns 对应 500 MHz。 |
@@ -57,7 +57,7 @@ flowchart LR
   E --> F --> G["实际数据与校验报告"]
 ```
 
-## 先改哪一项最容易看懂
+## 第一次修改，先改哪一项
 
 SMOKE 先改 `program.input`：41 改为 100，预期输出随之由 42 改为 101。先保留时钟、链路和内存设置。
 
@@ -65,7 +65,7 @@ SMOKE 先改 `program.input`：41 改为 100，预期输出随之由 42 改为 1
 在原项目 `user/` 执行 `./run.sh smoke --config experiment.json`，
 随后对照新结果目录的 `input.json`，确认这次确实使用了副本。
 
-## 参数如何分组理解
+## 这些参数分别控制什么
 
 | 一组参数 | 控制的事情 | 改后怎样核对 |
 |---|---|---|
@@ -76,7 +76,7 @@ SMOKE 先改 `program.input`：41 改为 100，预期输出随之由 42 改为 1
 | `memsim` | 内存标准、队列、通道和时间步长 | memsim_config.json |
 | `simulation` | 模型最多推进多长时间 | completion 和是否超时 |
 
-## 常见的合法性限制
+## 哪些设置会被拒绝
 
 - 时钟频率为 1～10000 MHz 的整数，并且周期必须能用整数 fs 表示。
 - AXI 周期为 1～1000 ns 的整数，在途容量为 1～128，planes 为 1～4。

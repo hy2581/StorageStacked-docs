@@ -1,8 +1,8 @@
-# main.cc：解释版
+# main.cc：仿真从哪里启动
 
-对应原文件：[coralnpu_StorageStacked/integration/main.cc](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/main.cc)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/integration/main.cc](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/main.cc)。
 
-独立仿真器的进程入口，读取配置、运行 SystemC，并记录设备完成状态。
+仿真从这里开始：读取配置、启动 SystemC，结束后写下设备为什么停止。
 
 ## 调用接口
 
@@ -58,7 +58,7 @@ flowchart TD
 正常完成时 completion 的 tick_fs 使用设备记录的 doneTick。
 达到 watchdog 上限却未完成时记录超时；修改超时值前先确认有没有不再返回的请求。
 
-## 三层成功条件
+## 怎样判断运行成功
 
 1. 文件和参数能加载；
 2. 设备 done，且 mailbox 为 `0x600d0000`；

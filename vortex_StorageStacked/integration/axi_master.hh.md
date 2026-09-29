@@ -1,8 +1,8 @@
-# axi_master.hh：解释版
+# axi_master.hh：转换请求时要保存哪些信息
 
-对应原文件：[vortex_StorageStacked/integration/axi_master.hh](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/axi_master.hh)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/integration/axi_master.hh](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/axi_master.hh)。
 
-声明 TLM 到 AXI 的适配器，以及请求属性、分段和在途队列。
+这个头文件声明了请求转换器，以及处理请求时要用到的队列和状态。
 
 ## 输入与输出
 

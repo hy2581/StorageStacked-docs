@@ -1,15 +1,15 @@
-# SConscript：解释版
+# SConscript：gem5 构建时加入哪些文件
 
-对应原文件：[vortex_StorageStacked/integration/SConscript](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/SConscript)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/integration/SConscript](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/SConscript)。
 
-将 integration 的 Python SimObject 与 C++ 桥接实现纳入 GEM5 构建。
+gem5 构建时会读这份清单，把 Python 配置对象和 C++ 存储桥一起编进去。
 
 ## 输入与输出
 
 输入为 GEM5 构建环境、STORAGE_STACK_ROOT 指向的公共项目，以及当前目录源码。
 输出是链接进 gem5.opt 的 StorageBridge 对象与适配代码；本文件不产生用户 ELF。
 
-## 逐段解释
+## 代码按顺序做什么
 
 | 语句 | 作用 |
 | --- | --- |

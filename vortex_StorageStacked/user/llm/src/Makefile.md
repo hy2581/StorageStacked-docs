@@ -1,10 +1,10 @@
-# Makefile：解释版
+# Makefile：用户程序怎样编译
 
-对应原文件：[vortex_StorageStacked/user/llm/src/Makefile](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/llm/src/Makefile)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/user/llm/src/Makefile](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/llm/src/Makefile)。
 
-声明当前用户项目的源码，并复用 SDK 的构建规则。
+这里列出要编译的源文件，再调用 SDK 的规则生成设备程序。
 
-## 逐项解释
+## 每一项的作用
 
 | 变量 | 取值 | 作用 |
 | --- | --- | --- |

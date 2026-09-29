@@ -1,8 +1,8 @@
-# smoke.cpp：解释版
+# smoke.cpp：NPU 怎样把 41 变成 42
 
-对应原文件：[coralnpu_StorageStacked/user/smoke/src/smoke.cpp](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/smoke/src/smoke.cpp)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/user/smoke/src/smoke.cpp](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/smoke/src/smoke.cpp)。
 
-最小 NPU 访存负载：写入输入，读回并加一，再写出与检查结果。
+这个小程序把 41 写进存储，再读回来加一，最后写出并读回 42。
 
 ## 输入与输出
 
@@ -40,7 +40,7 @@ flowchart LR
   A["SMOKE_INPUT"] --> B["NPU 写 input"] --> C["NPU 读 input"] --> D["加一并写 output"] --> E["读 output 比较"] --> F["mailbox + wfi"]
 ```
 
-## 按 41→42 把每一行走一遍
+## 从 41 到 42，程序每一步做什么
 
 ```cpp
 *input = SMOKE_INPUT;
@@ -64,7 +64,7 @@ const uint32_t observed = *output;
 `wfi` 让设备进入等待，运行器结合 mailbox 识别任务结束。
 它不是让你在终端上再输入数据。
 
-## 从数值转成字节看一次
+## 数字 41 在内存里是什么字节
 
 小端存储下，41 对应字节 `29 00 00 00`，42 对应 `2a 00 00 00`。
 NPU 原生接口一次返回 16 字节块，可能包含这个 4 字节整数和旁边字节。

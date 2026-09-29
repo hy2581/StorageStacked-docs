@@ -1,16 +1,16 @@
-# tinyllm.h：解释版
+# tinyllm.h：模型数据和地址怎么存
 
-对应原文件：[coralnpu_StorageStacked/user/llm/src/tinyllm.h](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/llm/src/tinyllm.h)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/user/llm/src/tinyllm.h](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/llm/src/tinyllm.h)。
 
-将模型结构、权重和可验证的内存布局集中在一个头文件中。
+模型大小、权重数值和各块数据的存放位置都写在这个头文件里。
 
-## 本文件保存什么
+## 这个文件保存什么
 
 这是固定的小型字符 Transformer 模型包：一层、两个注意力头、8 维特征、16 维 FFN，词表含 17 个字符。
 它同时保存结构常量、张量偏移、FP32 权重数组 `model_image` 和 `MODEL_LAYOUT` 元数据。
 prompt 与生成长度由 JSON 决定，经 SDK 写入另外生成的 `project_config.h`。
 
-## 模型常量
+## 模型的固定大小
 
 | 宏 | 值 | 用途 |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ prompt 与生成长度由 JSON 决定，经 SDK 写入另外生成的 `project_c
 | `LLM_WEIGHT_WORDS` | 1004 | 权重镜像的 FP32 存储字数 |
 | `LLM_TRACE_STRIDE` | 148 | 每个位置的中间结果槽位数，单位 float 元素 |
 
-## 权重布局
+## 权重按什么顺序存放
 
 `W_*` 宏和 `MODEL_LAYOUT.tensors` 描述同一份权重排布。
 下表偏移单位为 float 元素，每个元素 4 字节；例如 Q 权重地址为 `0x90000000 + 312 × 4`。
@@ -56,7 +56,7 @@ prompt 与生成长度由 JSON 决定，经 SDK 写入另外生成的 `project_c
 
 CoralNPU 的 `tinyllm.cpp` 在设备执行时把数组复制到外部 weights 区。
 
-## 中间结果布局
+## 中间结果放在哪里
 
 `T_*` 宏指定每个 token 位置中间值的起点。
 `trace[pos * LLM_TRACE_STRIDE + T_* + i]` 表示位置 pos、某一阶段的第 i 个元素。
@@ -133,7 +133,7 @@ Q 的设备地址 = 0x900004e0
 例如教学用的 `0x1p-1f` 表示 `1×2⁻¹=0.5`；p 后面是以 2 为底的指数。
 SDK 用 `float.fromhex` 读取模型镜像中的这些数，再把它们按 MODEL_LAYOUT 的张量位置归类。
 
-## 修改模型时必须一起考虑哪些文件
+## 改模型时还要改哪些文件
 
 只换 prompt 用 JSON。若换模型权重或维度，还要同步：
 

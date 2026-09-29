@@ -1,8 +1,8 @@
-# storage.hh：解释版
+# storage.hh：顶层模块有哪些部分
 
-对应原文件：[vortex_StorageStacked/integration/storage.hh](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/storage.hh)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/integration/storage.hh](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/storage.hh)。
 
-声明 GEM5 可实例化的 Bridge 模块，封装 TLM 入口和公共 AXI 存储连线。
+这个头文件声明 gem5 使用的存储桥：一边接收 TLM 请求，一边连接 AXI 存储。
 
 ## 成员与接口
 
@@ -31,7 +31,7 @@ flowchart LR
   E["monitor 与 VCD"] -.观察.-> C
 ```
 
-## 从“对象里有什么”理解这个头文件
+## 这个类保存了哪些东西
 
 头文件先列出成员，实际初始化次序和行为在 [storage.cc](storage.cc.md)。
 `public` 下的方法允许外部调用；`private` 下的成员由这个模块自己管理。

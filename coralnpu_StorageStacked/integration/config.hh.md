@@ -1,8 +1,8 @@
-# config.hh：解释版
+# config.hh：仿真参数从哪里来
 
-对应原文件：[coralnpu_StorageStacked/integration/config.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/config.hh)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/integration/config.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/config.hh)。
 
-定义 CoralNPU 桥接使用的统一 C++ 配置结构 ConfigParams。
+`ConfigParams` 把 NPU、AXI 和存储的设置放在一起，供仿真程序读取。
 
 ## 结构关系
 

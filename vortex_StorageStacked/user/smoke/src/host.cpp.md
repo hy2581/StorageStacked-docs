@@ -1,8 +1,8 @@
-# host.cpp：解释版
+# host.cpp：CPU 怎样准备和检查数据
 
-对应原文件：[vortex_StorageStacked/user/smoke/src/host.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/smoke/src/host.cpp)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/user/smoke/src/host.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/smoke/src/host.cpp)。
 
-GEM5 CPU 主机程序：多线程准备输入、驱动 Vortex，并读取和检查实际返回数据。
+这段程序在 gem5 模拟的 CPU 上运行：先准备输入，再启动 GPU，最后读取并检查结果。
 
 ## 它在哪里运行
 
@@ -58,7 +58,7 @@ flowchart TD
   F --> G["退出码与 HOST_TASK 日志"] --> H["外层校验与报告"]
 ```
 
-## 第一次遇到 Lambda，先看这个用法
+## 这段 Lambda 函数在做什么
 
 ```cpp
 on_cpu_cores("prepare", APP_WORKGROUPS, [&](unsigned i) {
@@ -72,7 +72,7 @@ on_cpu_cores("prepare", APP_WORKGROUPS, [&](unsigned i) {
 `[&]` 允许它直接使用外面的数组；`i` 告诉它现在该处理哪一项。
 `on_cpu_cores` 把这段操作命名为 `work`，每次执行 `work(i)` 就运行一次花括号中的代码。
 
-这时仍在模拟 CPU 中执行。发射 GPU 是后面的 `vx_enqueue_launch`，不是这里的 `work(i)`。
+这时仍在模拟 CPU 中执行。启动 GPU 程序 是后面的 `vx_enqueue_launch`，不是这里的 `work(i)`。
 
 ## 四个工作线程怎样分工
 
@@ -87,7 +87,7 @@ SMOKE 默认共 4 个元素、4 个线程：线程 0 处理 `[0,1)`，
 worker 是任务编号，tid 是运行时线程号，CPU 核号来自模拟器统计。
 当前代码没有把 worker 永久绑定到同号核心；不要把三者混在一起。
 
-## 上传、发射和读回必须等什么
+## CPU 什么时候能读取 GPU 的结果
 
 | 操作 | 为什么要等对应 event |
 |---|---|

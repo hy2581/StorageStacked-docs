@@ -1,8 +1,8 @@
-# kernel.cpp：解释版
+# kernel.cpp：GPU 怎样把输入加一
 
-对应原文件：[vortex_StorageStacked/user/smoke/src/kernel.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/smoke/src/kernel.cpp)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/user/smoke/src/kernel.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/smoke/src/kernel.cpp)。
 
-运行在 Vortex GPU 上的加一内核，每个工作组处理一个输入元素。
+这段 GPU 程序让每个工作组读取一个数、加一，再把结果写回。
 
 ## 输入与输出
 

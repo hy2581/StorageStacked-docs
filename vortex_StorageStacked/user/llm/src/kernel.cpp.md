@@ -1,8 +1,8 @@
-# kernel.cpp：解释版
+# kernel.cpp：GPU 怎样逐个生成字符
 
-对应原文件：[vortex_StorageStacked/user/llm/src/kernel.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/llm/src/kernel.cpp)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/user/llm/src/kernel.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/llm/src/kernel.cpp)。
 
-实现单层字符 Transformer 的初始化、prefill、因果注意力、FFN 和贪心生成。
+设备程序在这里读取输入文字，每次算出下一个字符；注意力和 FFN 等计算也写在这里。
 
 ## 运行位置与输入输出
 
@@ -27,7 +27,7 @@
 
 设备地址经过平台 BAR 映射进入 GEM5 物理地址空间；本配置的 `0x90000000` 对应 `0x190000000`。CPU 普通代码、栈和堆有自己的内存路径。
 
-## 按什么顺序读函数
+## 从哪个函数开始读
 
 | 函数 | 作用 |
 | --- | --- |
@@ -61,7 +61,7 @@
 
 本实现使用 SDK 提供的 `device_sqrt` 和 `device_exp`。
 
-## 报告如何读
+## 报告里的数据怎么找
 
 | uint32 索引 | 含义 |
 | --- | --- |
@@ -133,7 +133,7 @@ Softmax 把分数变成权重，再用这些权重汇总 V。
 减去最大分数再求指数，可以降低指数计算出现很大数值的风险。
 FFN 中 ReLU 的作用很直观：正数保留，负数变成 0。
 
-## 为什么要写这么多中间结果
+## 为什么要保存中间结果
 
 `dump` 把不同阶段向量写入外部 trace 区，让独立参考知道从哪一步开始偏离。
 例如 `trace[pos*148+16+j]` 对应该位置的 Q 分量。
@@ -143,7 +143,7 @@ Q/K/V、注意力，还是后面的投影出现问题。
 这些记录本身也会产生写访问，分析周期和带宽时应把观测开销算在这个示例范围内。
 `trace` 与 Q/K/V 都是数据；`report` 则主要保存整数编号、计数和状态。
 
-## 顺着生成循环算一次次数
+## 算一遍生成字符的次数
 
 默认 prompt 有 4 个字符、生成 3 个字符。打开 KV 时：
 第一轮算位置 0～3，第二轮算位置 4，第三轮算位置 5，共 6 次。

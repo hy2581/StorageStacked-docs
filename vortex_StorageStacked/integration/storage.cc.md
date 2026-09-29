@@ -1,10 +1,10 @@
-# storage.cc：解释版
+# storage.cc：仿真模块怎样连接
 
-对应原文件：[vortex_StorageStacked/integration/storage.cc](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/storage.cc)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/integration/storage.cc](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/storage.cc)。
 
-实现 GEM5/SystemC 组件装配，保留请求属性并将 AXI 信号接入公共存储。
+这里连接 gem5、SystemC 和公共存储，并保留请求的来源和字节选择信息。
 
-## 构造时完成的连接
+## 启动时连接哪些模块
 
 根据 StorageBridgeParams 创建时钟、Master、TLM wrapper 和监视器。
 将参数转成 StorageConfig 后创建 AouBackend，将两端接到同一套 AXI wires。
@@ -55,7 +55,7 @@ flowchart TD
 主端写入 awvalid，存储侧就从绑定的同一信号读取它；awready 的方向相反。
 这不是先复制一份 trace 再由另一端重放。
 
-## 运行完成后的收尾顺序有什么意义
+## 程序结束前还要做什么
 
 收尾时先整理已完成访问和各层记录，再关闭波形。
 `accepted` 表示正式接纳多少请求，`completed` 表示交回多少响应，

@@ -1,8 +1,8 @@
-# tinyllm.cpp：解释版
+# tinyllm.cpp：NPU 怎样逐个生成字符
 
-对应原文件：[coralnpu_StorageStacked/user/llm/src/tinyllm.cpp](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/llm/src/tinyllm.cpp)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/user/llm/src/tinyllm.cpp](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/llm/src/tinyllm.cpp)。
 
-实现单层字符 Transformer 的初始化、prefill、因果注意力、FFN 和贪心生成。
+设备程序在这里读取输入文字，每次算出下一个字符；注意力和 FFN 等计算也写在这里。
 
 ## 运行位置与输入输出
 
@@ -25,7 +25,7 @@
 
 这些是同一地址空间中的六个逻辑区域；不会因为分成六段，就自动对应六个 MEMSIM 通道。地址规划直接体现在本文件中。
 
-## 按什么顺序读函数
+## 从哪个函数开始读
 
 | 函数 | 作用 |
 | --- | --- |
@@ -59,7 +59,7 @@
 
 本实现使用 `sqrtf` 和 `expf`。
 
-## 报告如何读
+## 报告里的数据怎么找
 
 | uint32 索引 | 含义 |
 | --- | --- |
@@ -130,7 +130,7 @@ Softmax 把分数变成权重，再用这些权重汇总 V。
 减去最大分数再求指数，可以降低指数计算出现很大数值的风险。
 FFN 中 ReLU 的作用很直观：正数保留，负数变成 0。
 
-## 为什么要写这么多中间结果
+## 为什么要保存中间结果
 
 `dump` 把不同阶段向量写入外部 trace 区，让独立参考知道从哪一步开始偏离。
 例如 `trace[pos*148+16+j]` 对应该位置的 Q 分量。
@@ -140,7 +140,7 @@ Q/K/V、注意力，还是后面的投影出现问题。
 这些记录本身也会产生写访问，分析周期和带宽时应把观测开销算在这个示例范围内。
 `trace` 与 Q/K/V 都是数据；`report` 则主要保存整数编号、计数和状态。
 
-## 顺着生成循环算一次次数
+## 算一遍生成字符的次数
 
 默认 prompt 有 4 个字符、生成 3 个字符。打开 KV 时：
 第一轮算位置 0～3，第二轮算位置 4，第三轮算位置 5，共 6 次。

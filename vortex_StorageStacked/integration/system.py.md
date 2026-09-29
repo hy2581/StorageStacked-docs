@@ -1,8 +1,8 @@
-# system.py：解释版
+# system.py：gem5 怎样启动 CPU、GPU 和存储
 
-对应原文件：[vortex_StorageStacked/integration/system.py](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/system.py)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/integration/system.py](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/system.py)。
 
-GEM5 仿真的装配入口：创建 CPU/GPU 平台，并接入公共 AXI 存储服务。
+gem5 从这里创建 CPU、GPU 和存储桥，再设置它们之间的连接。
 
 ## 输入与输出
 
@@ -24,7 +24,7 @@ soc.create 创建 GEM5 CPU、MMU/TLB、CPU 缓存、Vortex 设备、主机进程
 | 映射设备窗口 | 将 vortex_cp、vortex_bar 映射到主机进程，按 4KiB 补齐长度并设为不可缓存。 |
 | 运行与导出 | 模拟至退出或 max_ticks；正常退出后调用 StorageBridge.finish，写 completion.json。 |
 
-## CPU 与 GPU 的边界
+## CPU 和 GPU 分别负责什么
 
 GEM5 CPU 执行 host.elf，模拟 CPU 的地址转换与 L1/L2 访问；Vortex SimX 执行 program.vxbin 中的 GPU 指令。
 设备访问经 GEM5 的 Vortex BAR 窗口进入这个存储桥。CPU 普通代码、堆栈和主存访问按 SoC 自身的主机内存路径处理。
@@ -33,7 +33,7 @@ GEM5 CPU 执行 host.elf，模拟 CPU 的地址转换与 L1/L2 访问；Vortex S
 当前 BAR 起点为 0x100000000、大小 4 GiB，GPU 地址 0x90000000 映射后为 0x190000000。
 地址转换在平台中完成，axi_master 按接收到的地址驱动 AXI。
 
-## 完成条件
+## 什么时候算运行结束
 
 GEM5 退出码必须为 0，退出原因必须包含 exiting with last active thread context。
 未满足时写入失败 completion 并抛出错误。正常完成后，外层 run.sh 继续做数值与协议验证。
@@ -46,7 +46,7 @@ flowchart LR
   G["SystemC_Kernel + GEM5 事件调度"] --> E
 ```
 
-## 三个执行位置要分清
+## 代码分别在哪台模拟设备上运行
 
 | 位置 | 运行什么 |
 |---|---|
@@ -68,7 +68,7 @@ GPU 程序中的 `0x90000000`，进入当前平台物理窗口后是
 它不会把所有 CPU 的栈、堆和代码都搬到公共 AXI 后端。
 普通主机内存与 GPU 窗口在平台中分别路由。
 
-## 为什么还要来源监测器和真实波形
+## 怎样确认请求确实到了存储
 
 HetAxiMonitor 用于区分请求来自哪里；它记录的来源信息不能替代线上的 VALID/READY。
 判断某拍是否真的握手，查看 axi_events.csv 与 axi_wave.vcd。

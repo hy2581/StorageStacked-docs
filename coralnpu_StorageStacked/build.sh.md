@@ -1,8 +1,8 @@
-# build.sh：解释版
+# build.sh：第一次构建和重新构建
 
-对应原文件：[coralnpu_StorageStacked/build.sh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/build.sh)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/build.sh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/build.sh)。
 
-仓库级构建入口：配置依赖路径，准备平台，并编译用户示例。
+运行 `build.sh` 会检查公共存储项目的位置，准备仿真平台，再编译自带的用户程序。
 
 ## 输入与输出
 
@@ -11,7 +11,7 @@
 `--storage` 使用相对于仓库根目录的路径，`--jobs` 支持 1..128。
 
 输出包括 CoralNPU 运行库、存储平台、`coralnpu_sim` 和两个示例的 `program.elf`。
-平台缓存放在 `coralnpu/.cache/`，示例构建产物放在各自的 `user/项目/result/build/`。
+平台缓存放在 `coralnpu/.cache/`，示例编译出的文件放在各自的 `user/项目/result/build/`。
 
 ## 脚本逐段做什么
 
@@ -50,7 +50,7 @@ cd user
 ./run.sh smoke
 ```
 
-## 第一次构建与日常运行怎样分开
+## 第一次构建和以后运行的区别
 
 `build.sh` 负责准备公共平台，让编译器、设备模型和存储库能一起工作。
 `user/run.sh` 负责具体一次任务，包括新建结果目录、运行和验收。
@@ -67,7 +67,7 @@ cd user
 `--storage` 从仓库根目录解析；上例指向旁边的公共存储目录。
 `--jobs 4` 限制现实机器上的并行编译任务数。它不改变模拟处理器核数。
 
-## 哪些改动要回到这里
+## 改了哪些文件需要重新构建
 
 | 改动 | 推荐操作 |
 |---|---|
@@ -79,7 +79,7 @@ cd user
 配置切换与源码编辑有区别：自动平台检查识别配置，不保证识别所有源码变动。
 修改平台实现后不要只靠旧缓存运行。
 
-## 构建失败先查什么
+## 构建失败先查哪里
 
 本外层脚本把内部构建输出写入 `coralnpu/.cache/last-build.log`。
 终端末尾几行只是摘要；查编译失败应打开完整日志，从最早的实际错误看起。

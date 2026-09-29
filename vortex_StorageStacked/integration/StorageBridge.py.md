@@ -1,8 +1,8 @@
-# StorageBridge.py：解释版
+# StorageBridge.py：Python 配置怎样传给 C++
 
-对应原文件：[vortex_StorageStacked/integration/StorageBridge.py](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/StorageBridge.py)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/integration/StorageBridge.py](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/integration/StorageBridge.py)。
 
-声明 GEM5 可配置的 StorageBridge 对象，将 Python 参数映射到 C++ Bridge。
+这里列出 `StorageBridge` 能从 Python 设置哪些参数；gem5 会把这些值传给 C++ 存储桥。
 
 ## Python 与 C++ 怎样对应
 

@@ -1,8 +1,8 @@
-# storage.hh：解释版
+# storage.hh：顶层模块有哪些部分
 
-对应原文件：[coralnpu_StorageStacked/integration/storage.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/storage.hh)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/integration/storage.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/storage.hh)。
 
-声明 Demo：将 CoralNPU AXI master 与公共存储连接起来的 SystemC 顶层模块。
+这个头文件声明仿真顶层模块；它把 NPU 的 AXI 接口和公共存储连在一起。
 
 ## 成员分别负责什么
 
@@ -30,7 +30,7 @@ flowchart LR
   D --> E
 ```
 
-## 从“对象里有什么”理解这个头文件
+## 这个类保存了哪些东西
 
 头文件先列出成员，实际初始化次序和行为在 [storage.cc](storage.cc.md)。
 `public` 下的方法允许外部调用；`private` 下的成员由这个模块自己管理。

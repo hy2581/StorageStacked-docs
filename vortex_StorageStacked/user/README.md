@@ -1,10 +1,10 @@
-# vortex_StorageStacked/user：阅读导航
+# Vortex：用户程序怎么配置和运行
 
-用户在这里选择负载与参数，编写源码，运行项目并查看结果。
-本目录使用“原文件名 + .md”命名；这些副本的内容是 Markdown 解释，运行操作请回到原工程。
+用户程序放在 `user/`：先在 `config.json` 里选参数，再改 `src/` 中的代码，最后用 `run.sh` 执行。
+这里说明每个文件的作用。需要运行时，请打开同名的项目仓库，按那里的命令操作。
 先看 config.json，再看 Makefile 和计算源码，最后看 run.sh 如何把各阶段串起来。
 
-## 逐文件入口
+## 按文件找说明
 
 | 文件 | 用途 |
 | --- | --- |
@@ -22,7 +22,7 @@
 | [llm/src/tinyllm.h.md](llm/src/tinyllm.h.md) | 模型结构、权重和布局 |
 | [llm/result/README.md](llm/result/README.md) | 生成输出按文件类型解释 |
 
-## 整体流程
+## 运行顺序
 
 ```mermaid
 flowchart TD
@@ -37,7 +37,7 @@ flowchart TD
 
 平台准备见 [build.sh.md](../build.sh.md)，桥接细节见 [integration 导航](../integration/README.md)。
 
-## 从运行结果倒着找源码
+## 从结果找到对应源码
 
 第一次可以只读 SMOKE 的几份文件：
 
@@ -48,9 +48,9 @@ flowchart TD
 5. `run.sh.md`：把编译、运行、校验串起来。
 
 同名的 smoke、llm 各有独立配置和结果目录。修改 smoke 的 JSON 不会改变 llm 的输入。
-根目录构建得到的 `result/build/` 只是预编译产物；一次完整运行会另建结果目录。
+根目录构建得到的 `result/build/` 只是预编译出的文件；一次完整运行会另建结果目录。
 
-## 新任务需要哪些文件
+## 新建任务要准备哪些文件
 
 | 文件 | 是否手工维护 | 用途 |
 |---|---|---|

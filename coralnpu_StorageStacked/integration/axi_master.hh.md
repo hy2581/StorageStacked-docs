@@ -1,10 +1,10 @@
-# axi_master.hh：解释版
+# axi_master.hh：转换请求时要保存哪些信息
 
-对应原文件：[coralnpu_StorageStacked/integration/axi_master.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/axi_master.hh)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/integration/axi_master.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/axi_master.hh)。
 
-声明 CoralNPU 原生请求到 AXI 的适配器 Master，以及它维护的请求状态。
+这个头文件声明了请求转换器：它接收 NPU 的读写请求，记录状态，随后发送 AXI 信号。
 
-## 对外接口
+## 其他文件怎样调用它
 
 输入为 ConfigParams、AXI 时钟/复位，以及 CoralNPU 原生运行库回调的访存请求。
 输出是 MasterPorts 的五个 AXI 通道；AXI 返回数据完成后，再回送 CoralNPU。

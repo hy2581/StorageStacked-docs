@@ -1,10 +1,10 @@
-# Makefile：解释版
+# Makefile：用户程序怎样编译
 
-对应原文件：[coralnpu_StorageStacked/user/smoke/src/Makefile](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/smoke/src/Makefile)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/user/smoke/src/Makefile](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/smoke/src/Makefile)。
 
-声明当前用户项目的源码，并复用 SDK 的构建规则。
+这里列出要编译的源文件，再调用 SDK 的规则生成设备程序。
 
-## 逐项解释
+## 每一项的作用
 
 | 变量 | 取值 | 作用 |
 | --- | --- | --- |

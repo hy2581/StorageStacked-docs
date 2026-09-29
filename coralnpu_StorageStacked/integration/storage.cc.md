@@ -1,8 +1,8 @@
-# storage.cc：解释版
+# storage.cc：仿真模块怎样连接
 
-对应原文件：[coralnpu_StorageStacked/integration/storage.cc](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/storage.cc)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[coralnpu_StorageStacked/integration/storage.cc](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/storage.cc)。
 
-实现 Demo 的连线、复位、波形记录和仿真结束导出。
+这里连接 NPU 与存储，控制启动时的复位，并在结束时保存波形和运行记录。
 
 ## 构造函数做什么
 
@@ -40,7 +40,7 @@ flowchart TD
 主端写入 awvalid，存储侧就从绑定的同一信号读取它；awready 的方向相反。
 这不是先复制一份 trace 再由另一端重放。
 
-## 运行完成后的收尾顺序有什么意义
+## 程序结束前还要做什么
 
 收尾时先整理已完成访问和各层记录，再关闭波形。
 `accepted` 表示正式接纳多少请求，`completed` 表示交回多少响应，

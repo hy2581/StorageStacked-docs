@@ -1,8 +1,8 @@
-# run.sh：解释版
+# run.sh：怎样编译、仿真和检查一个项目
 
-对应原文件：[vortex_StorageStacked/user/run.sh](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/run.sh)。本文件以原文件名加 `.md` 命名，内容为 Markdown 阅读说明。
+对应原文件：[vortex_StorageStacked/user/run.sh](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/run.sh)。
 
-用户项目的统一运行入口，串联编译、仿真和结果校验。
+运行 `user/run.sh` 会依次编译项目、启动仿真，并检查结果。
 
 ## 用户输入
 
@@ -20,7 +20,7 @@
 默认配置是 `config.json`，默认输出为带时间戳的新 `result/` 子目录。
 已存在的运行目录不会被默默覆盖；再次使用自定义名称时应换一个新名称。
 
-## 按执行顺序读脚本
+## 脚本运行时依次做什么
 
 | 位置或阶段 | 作用 |
 | --- | --- |
@@ -28,21 +28,21 @@
 | 环境准备 | 切换至仓库根目录，加载 `third_party/gem5/runtime/environment.sh`，确定内部 Python 和工具。 |
 | prepare | 校验相对路径和配置，创建新的结果目录，保存 input.json，固定本次输入。 |
 | 编译 | 先检查平台是否就绪；需要构建时持有独占锁，否则使用共享锁，然后调用项目 Makefile。 |
-| resolve | 解析配置与编译产物，记录 resolved.json、environment.json 和运行器路径。 |
+| resolve | 解析配置与编译出的文件，记录 resolved.json、environment.json 和运行器路径。 |
 | simulate | 在结果目录启动 gem5.opt 和 integration/system.py，CPU 执行 host.elf，GPU 执行 program.vxbin。 |
 | validate | 校验计算返回值、模型数据和 AXI/UCIe/MEMSIM 链路，生成 summary.json 与 report.md。 |
 | finish | EXIT trap 汇总当前阶段和退出码；只有整体验证通过才打印 PASS，否则写入失败状态。 |
 
-## 锁、错误和测试入口
+## 构建时等待、出错和测试怎么处理
 
 构建锁防止运行期间的平台文件被另一个构建替换。构建需要独占访问，仿真阶段使用共享锁。
 `stage` 依次为 build、simulate、validate，出错时保留失败阶段和已经产生的日志。
 INT/TERM 信号分别转换为退出码 130/143，再进入统一收尾流程。
 
 `--test` 转入内部回归入口，它使用内置回归配置，不能与自定义配置或输出路径一起使用。
-添加新项目时，入口通过目录、JSON 和 Makefile 识别它；若引入新的负载类型，还需要让内部配置与校验逻辑支持其约定。
+添加新项目时，入口通过目录、JSON 和 Makefile 识别它；若引入新的任务类型，还需要让内部配置与校验逻辑支持其约定。
 
-## 主要输出
+## 运行后保存什么
 
 本次运行的所有主要文件保存在 `user/项目/result/运行目录/`：
 `build.log` 记录编译，`run.log` 记录仿真，`validation.log` 记录校验。
@@ -59,7 +59,7 @@ flowchart TD
   E -->|失败| G
 ```
 
-## 按一条真实命令展开路径
+## 这条命令会读写哪些路径
 
 假设在原项目 `user/` 执行：
 
@@ -89,7 +89,7 @@ OUT 是 `../result/slow-01/build`。两者都以 `src/` 为起点。
 等待构建锁时，终端可能暂时没有新输出。先确认是否有另一项构建或仿真占用平台。
 当前命令无 --input 事务选项；它执行的是 C++ 用户任务。
 
-## 失败阶段与下一步
+## 出错后先查哪里
 
 - `build`：读 build.log，先修编译或平台就绪问题。
 - `simulate`：读 run.log 和 completion，判断加载、设备运行还是超时。
