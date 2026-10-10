@@ -48,13 +48,15 @@
 | 文件或目录 | 看什么 |
 | --- | --- |
 | `npu_requests.csv` | NPU 原生请求与响应，含序号、原生 ID、AXI ID、数据和掩码。 |
-| `build/program.elf` | 由 CoralNPU 加载的 RV32 程序。 |
+| `build/program.elf` | 由启用 RVV 的 CoralNPU 加载的 RV32 程序。 |
+| `build/program.dis` | ELF 反汇编，可核对 vsetvli、vle32、vfmul、vfadd、vse32 指令。 |
 | `build/simulator.path` | 运行入口选中的 coralnpu_sim 路径。 |
 
 ## 这次运行重点看什么
 
 先确认 input.json 中 prompt 保留了末尾空格、generated_tokens 和 kv_cache 符合本次选择。
 再核对返回权重、KV、中间 trace、生成 token 和 forward 计数。
+`llm_summary.json.execution` 记录 RVV FP32 线性层执行信息；默认运行完成 42 次线性层调用。
 权重、KV、trace、token、report 的设备地址从 0x90000000 起分区，具体地址见对应的计算源码说明。
 GPU 版本的设备地址还会经过 BAR 映射，关联 AXI 地址时要使用转换后的地址。
 

@@ -1,6 +1,6 @@
 # main.cc：仿真从哪里启动
 
-对应原文件：[coralnpu_StorageStacked/integration/main.cc](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/main.cc)。
+对应原文件：[coralnpu_StorageStacked/integration/main.cc](https://github.com/hy2581/coralnpu_StorageStacked/blob/b90c7140d2717ee0a0dbec8308ae3488510b9acf/integration/main.cc)。
 
 仿真从这里开始：读取配置、启动 SystemC，结束后写下设备为什么停止。
 
@@ -17,6 +17,7 @@ user/run.sh 在结果目录中执行它，因此输出目录通常传 `.`。
 | 设置时间单位 | 使用 1 fs 时间分辨率。 |
 | 读取 JSON | 读取 architecture 和 kernel 路径，填充 ConfigParams。 |
 | 转换时钟 | AXI 周期 ns × 1000000 得到 fs；NPU 周期为 1000000000 / clock_mhz fs。 |
+| 读取 burst | 从 architecture.axi.burst_beats 取拍数，省略时为 4，并写入实际 config.json。 |
 | 核对 UCIe | 运行配置的四项 UCIe 参数必须与当前平台编译值一致，否则抛出错误。 |
 | 写出实际配置 | ucie_config.json 保存编译链路值；config.json 保存程序实际使用的时钟、地址窗口等。 |
 | 创建 Demo | 构建 NPU AXI master、公共存储、时钟复位和监视器。 |

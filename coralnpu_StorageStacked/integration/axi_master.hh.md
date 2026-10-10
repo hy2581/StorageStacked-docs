@@ -1,6 +1,6 @@
 # axi_master.hh：转换请求时要保存哪些信息
 
-对应原文件：[coralnpu_StorageStacked/integration/axi_master.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/axi_master.hh)。
+对应原文件：[coralnpu_StorageStacked/integration/axi_master.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/b90c7140d2717ee0a0dbec8308ae3488510b9acf/integration/axi_master.hh)。
 
 这个头文件声明了请求转换器：它接收 NPU 的读写请求，记录状态，随后发送 AXI 信号。
 
@@ -17,6 +17,7 @@ idle、done、cycles、mailbox、doneTick 供顶层决定仿真何时结束。
 | `seq / nativeId` | 设备原生请求的序号与 ID |
 | `id` | 适配器分配的 AXI wire ID |
 | `address / mask / data` | 16 字节对齐的地址、16 位字节有效掩码、16 字节数据 |
+| `wbeat / rbeat` | 已握手的写数据拍数、已接收的读数据拍数 |
 | `write / response / ready` | 读写方向、响应码、AXI 返回是否已就绪 |
 | `begin / accept / axiDone` | 请求建立、接受、AXI 完成时间 |
 | `awAfter / wAfter` | 允许发出写地址和写数据的最早周期，用于通道独立性测试 |
@@ -26,6 +27,9 @@ idle、done、cycles、mailbox、doneTick 供顶层决定仿真何时结束。
 active 按 AXI ID 保存在途请求。order 按“读写方向 + nativeId”记录顺序，保证同类原生 ID 的完成顺序。
 awq、wq、arq 分别负责写地址、写数据和读地址，允许不同通道独立推进。
 nativeClock 驱动 NPU，clk 驱动 AXI，两者有各自周期。
+
+`beatBytes=16/config.burst_beats`，`beatSize=log2(beatBytes)`。
+默认 4 拍、每拍 4 字节；只有全部 W 拍握手后移除 wq 队头，全部 R 拍收齐后标记 ready。
 
 submit 接收设备请求；tick 处理 AXI 握手；drive 给出下一周期信号；
 retire 把已就绪的响应按序交回设备；nativeTick 推进一步 NPU；sourceRow 写原生请求日志。

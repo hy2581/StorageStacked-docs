@@ -1,6 +1,6 @@
 # build.sh：第一次构建和重新构建
 
-对应原文件：[vortex_StorageStacked/build.sh](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/build.sh)。
+对应原文件：[vortex_StorageStacked/build.sh](https://github.com/hy2581/vortex_StorageStacked/blob/977cfe8acb737d2f99a6304135a861ba8112ca9c/build.sh)。
 
 运行 `build.sh` 会检查公共存储项目的位置，准备仿真平台，再编译自带的用户程序。
 
@@ -23,7 +23,7 @@
 | setup.sh + environment.sh | 准备工具并加载内部编译、运行环境。 |
 | build.py --force | 按 user/smoke/config.json 构建 gem5/Vortex 和存储平台。 |
 | 遍历 smoke、llm | 分别调用 src/Makefile，CONFIG 指向各自 JSON，OUT 指向各自 result/build。 |
-| 解锁并可选测试 | 释放锁；有 --test 时转入完整回归，没有时打印下一步运行命令。 |
+| 解锁并可选测试 | 释放锁；有 --test 时执行一次平台回归，SMOKE 和 LLM 的默认场景各运行一次，没有时打印下一步运行命令。 |
 
 ## 后续切换硬件配置
 

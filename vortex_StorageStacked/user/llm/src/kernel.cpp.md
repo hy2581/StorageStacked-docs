@@ -1,6 +1,6 @@
 # kernel.cpp：GPU 怎样逐个生成字符
 
-对应原文件：[vortex_StorageStacked/user/llm/src/kernel.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/llm/src/kernel.cpp)。
+对应原文件：[vortex_StorageStacked/user/llm/src/kernel.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/977cfe8acb737d2f99a6304135a861ba8112ca9c/user/llm/src/kernel.cpp)。
 
 设备程序在这里读取输入文字，每次算出下一个字符；注意力和 FFN 等计算也写在这里。
 
@@ -10,7 +10,8 @@
 输入是 `tinyllm.h` 提供的模型定义，以及 `project_config.h` 中的 prompt、生成长度和 KV 开关。
 输出包括生成 token、K/V 缓存、中间值和报告区状态，均通过源码中的内存指针读写。
 
-计算使用 FP32。模型采用字符级贪心生成：每轮选择 logits 最大的字符编号。
+计算使用 FP32。线性层使用工作组内的 SIMT 多线程协作，默认 8 个线程、2 个 warp。
+归一化、注意力与生成控制由组内线程 0 完成，中间数组放在共享局部内存。模型采用字符级贪心生成：每轮选择 logits 最大的字符编号。
 
 ## 先看内存分区
 
@@ -32,7 +33,7 @@
 | 函数 | 作用 |
 | --- | --- |
 | `kernel_main()` | 程序入口：初始化、逐轮生成、记录完成状态。先读它就能看懂整体顺序。 |
-| `forward(pos)` | 计算一个 token 位置的完整 Transformer，并返回下一字符的候选编号。 |
+| `forward(s, pos)` | 计算一个 token 位置的完整 Transformer，并返回下一字符的候选编号。 |
 | `norm(...)` | LayerNorm：均值、方差、epsilon=1e-5，再应用权重和偏置。 |
 | `linear(...)` | 输入向量乘行主序权重矩阵，可附加偏置。矩阵索引为 matrix + i * cols + j。 |
 | `dump(...)` | 把某阶段中间向量写入 trace 对应位置，便于独立核对。 |
@@ -69,13 +70,17 @@
 | `report[1]` | `1`：初始化完成 |
 | `report[2]` | `2`：全部生成步骤完成 |
 | `report[8]` | 程序内累计错误数 |
+| `report[9]` | 并行线性层调用数，默认 42 |
+| `report[10..12]` | 发射线程数、实际参与线程数、warp 数 |
+| `report[13]` | 工作组实际所在 GPU 核 |
+| `report[128 + tid]` | 该线程完成的输出列数 |
 | `report[16 + step]` | 第 step 轮选出的 token 编号 |
 | `report[32 + step]` | `0x70000000 + step`：该轮开始标记 |
 | `report[64 + step]` | `0x71000000 + step`：该轮结束标记 |
 | `report[96 + step]` | 截至该轮结束累计调用 forward 的次数 |
 | `report[3]` | `0x600d0000` 成功；`0xbad00000` 失败 |
 
-GPU 写入 report[3] 后返回；CPU 主机程序读取该状态和实际返回数据。LLM 当前只发射一个工作组、一个线程，CPU 的输入准备与返回检查另外使用多个线程。
+GPU 写入 report[3] 后返回；CPU 主机程序读取该状态和实际返回数据。LLM 使用一个工作组，默认 8 个线程在一个 GPU 核上协作；CPU 的输入准备与返回检查也使用多个线程。
 
 完整通过还需要运行入口调用独立参考校验器，比较实际权重、KV、中间值和 token，再检查存储链路。该 Python 参考运行在外层主机上。
 
@@ -107,7 +112,7 @@ x[j] = weights[W_EMBEDDING + id * LLM_DIM + j]
 它们的作用不同。对 `id=6,pos=2,j=0`，两个元素下标分别为
 `0+6×8=48` 和 `136+2×8=152`。
 
-## linear 里的两层循环在算什么
+## linear 怎样分配到多个线程
 
 每个输出数是一串“相乘后相加”。用教学用的小向量 `[2,3]` 举例：
 
@@ -121,6 +126,13 @@ x[j] = weights[W_EMBEDDING + id * LLM_DIM + j]
 这是解释索引的算术例子，不是当前模型的一组实测权重。
 代码 `matrix + i*cols + j` 用 i 选择矩阵的输入行，用 j 选择输出列，
 与上面的逐项累加对应。有 bias 时再加对应偏置。
+
+线程 t 处理列 `t, t+blockDim.x, ...`，每个输出列只有一个线程写入。
+每列仍按输入行顺序做 FP32 乘法与加法，避免改变独立参考的累加顺序。
+`on_leader()` 用 `vx_split/vx_join` 控制线程 0 的串行阶段；输出列尾块也显式分歧并重汇合。
+`linear()` 结束时所有线程执行 `__syncthreads()`，再消费共享结果。
+默认运行各线程累计处理列数为 `[60,54,54,54,54,54,54,54]`，
+通过 `report[128+tid]` 实际回读核对，不能用硬件配置的线程数代替工作量。
 
 ## 注意力怎样使用已有内容
 

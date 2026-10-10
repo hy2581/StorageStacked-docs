@@ -1,6 +1,6 @@
 # tinyllm.cpp：NPU 怎样逐个生成字符
 
-对应原文件：[coralnpu_StorageStacked/user/llm/src/tinyllm.cpp](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/llm/src/tinyllm.cpp)。
+对应原文件：[coralnpu_StorageStacked/user/llm/src/tinyllm.cpp](https://github.com/hy2581/coralnpu_StorageStacked/blob/b90c7140d2717ee0a0dbec8308ae3488510b9acf/user/llm/src/tinyllm.cpp)。
 
 设备程序在这里读取输入文字，每次算出下一个字符；注意力和 FFN 等计算也写在这里。
 
@@ -10,7 +10,8 @@
 输入是 `tinyllm.h` 提供的模型定义，以及 `project_config.h` 中的 prompt、生成长度和 KV 开关。
 输出包括生成 token、K/V 缓存、中间值和报告区状态，均通过源码中的内存指针读写。
 
-计算使用 FP32。模型采用字符级贪心生成：每轮选择 logits 最大的字符编号。
+计算使用 FP32，在启用 RVV 的 `RvvCoreMiniAxi` 上运行。`linear()` 的线性变换使用 RVV，
+LayerNorm、注意力与生成控制使用标量。模型采用字符级贪心生成：每轮选择 logits 最大的字符编号。
 
 ## 先看内存分区
 
@@ -32,7 +33,7 @@
 | `main()` | 程序入口：初始化、逐轮生成、记录完成状态。先读它就能看懂整体顺序。 |
 | `forward(pos)` | 计算一个 token 位置的完整 Transformer，并返回下一字符的候选编号。 |
 | `norm(...)` | LayerNorm：均值、方差、epsilon=1e-5，再应用权重和偏置。 |
-| `linear(...)` | 输入向量乘行主序权重矩阵，可附加偏置。矩阵索引为 matrix + i * cols + j。 |
+| `linear(...)` | RVV 每个 lane 计算一个输出列，输入向量乘行主序权重矩阵，可附加偏置。 |
 | `dump(...)` | 把某阶段中间向量写入 trace 对应位置，便于独立核对。 |
 
 ## 入口怎样生成多个字符
@@ -67,6 +68,7 @@
 | `report[1]` | `1`：初始化完成 |
 | `report[2]` | `2`：全部生成步骤完成 |
 | `report[8]` | 程序内累计错误数 |
+| `report[9]` | RVV 线性层累计执行次数，每次 forward 执行 7 次 |
 | `report[16 + step]` | 第 step 轮选出的 token 编号 |
 | `report[32 + step]` | `0x70000000 + step`：该轮开始标记 |
 | `report[64 + step]` | `0x71000000 + step`：该轮结束标记 |
@@ -104,7 +106,7 @@ x[j] = weights[W_EMBEDDING + id * LLM_DIM + j]
 它们的作用不同。对 `id=6,pos=2,j=0`，两个元素下标分别为
 `0+6×8=48` 和 `136+2×8=152`。
 
-## linear 里的两层循环在算什么
+## linear 怎样使用 RVV
 
 每个输出数是一串“相乘后相加”。用教学用的小向量 `[2,3]` 举例：
 
@@ -118,6 +120,14 @@ x[j] = weights[W_EMBEDDING + id * LLM_DIM + j]
 这是解释索引的算术例子，不是当前模型的一组实测权重。
 代码 `matrix + i*cols + j` 用 i 选择矩阵的输入行，用 j 选择输出列，
 与上面的逐项累加对应。有 bias 时再加对应偏置。
+
+外层按 `__riscv_vsetvl_e32m1(cols-j)` 返回的 VL 分块，一块同时处理多个输出列。
+`vle32` 读取当前输入行的连续权重，`vfmul.vf` 将各列权重乘以 `x[i]`，
+`vfadd.vv` 将乘积累加；最后 `vse32` 写入局部输出数组。
+17 列 logits 的尾块由实际 VL 控制，不越界。乘法和加法分开，保持各列的累加顺序。
+
+默认运行处理 6 个 token 位置，完成 42 次 RVV 线性层调用。
+设备把计数写入 `report[9]`，独立校验器同时检查计数、各阶段中间值与最终 token。
 
 ## 注意力怎样使用已有内容
 

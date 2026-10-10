@@ -1,6 +1,6 @@
 # host.cpp：CPU 怎样准备和检查数据
 
-对应原文件：[vortex_StorageStacked/user/llm/src/host.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/llm/src/host.cpp)。
+对应原文件：[vortex_StorageStacked/user/llm/src/host.cpp](https://github.com/hy2581/vortex_StorageStacked/blob/977cfe8acb737d2f99a6304135a861ba8112ca9c/user/llm/src/host.cpp)。
 
 这段程序在 gem5 模拟的 CPU 上运行：先准备输入，再启动 GPU，最后读取并检查结果。
 
@@ -34,7 +34,7 @@ prepare 在 GPU 队列创建前执行，check 在队列释放后执行，减少�
 | CPU 准备 | 多线程将 model_image 复制到 weights 缓冲。 |
 | 创建设备资源 | 打开 Vortex、创建队列，预留设备地址 0x90000000 起的 0x60000 字节缓冲。 |
 | 上传输入 | 将权重写到缓冲偏移 0，将 prompt 写到偏移 0x40000，并等待事件完成。 |
-| 加载与发射 | 加载 argv[1] 中的设备镜像，获取 main 内核，发射 APP_WORKGROUPS 个组，每组 1 个线程。 |
+| 加载与发射 | 加载 argv[1] 中的设备镜像，获取 main 内核，发射一个工作组，包含 LLM_GPU_THREADS 个线程，按 sizeof(LlmScratch) 分配共享局部内存。 |
 | 等待与读回 | 等待 GPU 事件结束，readback_all 读取 SDK 规定的实际结果区域。 |
 | 释放资源 | 释放内核、模块、缓冲和队列，输出设备性能数据并释放设备。 |
 | CPU 检查 | 多线程逐字比较返回权重；再检查生成 token 是否落在词表范围，读取 report[3]。 |
@@ -46,7 +46,9 @@ prepare 在 GPU 队列创建前执行，check 在队列释放后执行，减少�
 GPU 源码使用对应设备地址；例如偏移 `0x10000` 对应 `0x90010000`。
 平台把这些设备地址映射到 GEM5 的 Vortex BAR 窗口，之后由 integration 转成 AXI 请求。
 
-`project_config.h` 提供 HOST_CPU_COUNT、APP_WORKGROUPS 和负载输入常量；
+`project_config.h` 提供 HOST_CPU_COUNT、LLM_GPU_THREADS 和负载输入常量；
+LLM_GPU_THREADS 为 `min(8, gpu.threads × gpu.warps)`，默认 8。
+`llm_parallel.h` 提供主机和内核共用的共享局部内存结构。
 `host_io.h` 提供 CHECK、wait_event 和 readback_all 等公共辅助操作。
 这些编译依赖由 SDK 提供，无需逐份复制进项目。
 

@@ -1,6 +1,6 @@
 # config.json：这次运行选什么参数
 
-对应原文件：[vortex_StorageStacked/user/llm/config.json](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/user/llm/config.json)。
+对应原文件：[vortex_StorageStacked/user/llm/config.json](https://github.com/hy2581/vortex_StorageStacked/blob/977cfe8acb737d2f99a6304135a861ba8112ca9c/user/llm/config.json)。
 
 在这里设置输入文字、生成长度、KV cache，以及设备和存储的运行参数。
 
@@ -68,6 +68,8 @@ JSON 未提供通用地址布局字段，当前数据区地址由示例源码定
 两套核数分别控制 CPU 与 GPU，不能互相替代。
 
 SMOKE 的 `program.workers=4` 表示 4 个 GPU 工作组；LLM 没有该字段，SDK 为它设置 1 个工作组。
+LLM 每组发射 `min(8, gpu.threads × gpu.warps)` 个线程，默认 8 个线程、2 个 warp，在一个 GPU 核上执行。
+实际工作量看 `llm_summary.json.execution.columns_per_thread`，配置容量不能代替执行证据。
 两个示例的 `host.cpp` 都创建 `HOST_CPU_COUNT` 个 CPU 工作线程，承担输入准备和返回检查。
 核数、可容纳的线程数和一次负载真正发射的线程数是三个不同数值。
 
@@ -121,5 +123,5 @@ LLM 先保持 `prompt="red "` 和生成 3 个字符，只把 `kv_cache` 改为 f
 `program.type` 必须与源程序使用的宏和检查约定匹配。
 例如 smoke 用 `SMOKE_INPUT`，custom 的 `defines.INPUT` 生成的是 `APP_INPUT`。
 
-更完整的字段限制由 [当前 configure.py](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/third_party/gem5/runtime/configure.py) 检查。
+更完整的字段限制由 [当前 configure.py](https://github.com/hy2581/vortex_StorageStacked/blob/977cfe8acb737d2f99a6304135a861ba8112ca9c/third_party/gem5/runtime/configure.py) 检查。
 prompt 的词表检查还在模型编译步骤中进行，不能只通过 JSON 语法就算输入可运行。

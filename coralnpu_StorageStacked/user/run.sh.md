@@ -1,6 +1,6 @@
 # run.sh：怎样编译、仿真和检查一个项目
 
-对应原文件：[coralnpu_StorageStacked/user/run.sh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/run.sh)。
+对应原文件：[coralnpu_StorageStacked/user/run.sh](https://github.com/hy2581/coralnpu_StorageStacked/blob/b90c7140d2717ee0a0dbec8308ae3488510b9acf/user/run.sh)。
 
 运行 `user/run.sh` 会依次编译项目、启动仿真，并检查结果。
 
@@ -39,7 +39,7 @@
 `stage` 依次为 build、simulate、validate，出错时保留失败阶段和已经产生的日志。
 INT/TERM 信号分别转换为退出码 130/143，再进入统一收尾流程。
 
-`--test` 转入内部回归入口，它使用内置回归配置，不能与自定义配置或输出路径一起使用。
+`--test` 转入内部回归入口，将所选项目的默认场景运行一次，并完成相关验收；不能与自定义配置或输出路径一起使用。
 添加新项目时，入口通过目录、JSON 和 Makefile 识别它；若引入新的任务类型，还需要让内部配置与校验逻辑支持其约定。
 
 ## 运行后保存什么

@@ -18,7 +18,7 @@
 
 | 文件或目录 | 看什么 |
 | --- | --- |
-| `llm_summary.json` | 实际生成 token、模型输入、独立数值核对与推理检查汇总。 |
+| `llm_summary.json` | 实际生成 token、模型输入、独立数值核对与 SIMT 各线程工作量。 |
 | `input.json` | 运行时保存的输入配置；先看它，确认自己没有打开旧结果。 |
 | `resolved.json` | 运行所需的 architecture、程序路径、模型信息等解析结果。 |
 | `environment.json` | 本次运行使用的环境与工具信息。 |
@@ -48,6 +48,7 @@
 | 文件或目录 | 看什么 |
 | --- | --- |
 | `build/host.elf` | GEM5 x86 CPU 执行的主机程序。 |
+| `build/program.dis` | 本次设备 ELF 的反汇编，便于核对线程与屏障指令。 |
 | `build/program.elf`、`build/program.vxbin` | RV32 ELF 与 Vortex 加载镜像。 |
 | `build/programs.json`、`build/sources/`、`build/readback.json` | CPU/GPU 程序及源文件对应关系、本次编译保存的源码副本和实际读回的地址范围。 |
 | `build/simulator.path`、`build/system.path` | 本次 GEM5 程序和 system.py 入口位置。 |
@@ -117,3 +118,5 @@ Vortex 从 transactions.csv 的地址、ID、开始/完成时间和 segments 开
 结果里出现的历史计数、延迟属于那一份配置和程序，不能直接套到另一份实验。
 
 本页是结果读法，不是本轮新仿真的通过报告。
+
+`llm_summary.json.execution` 保存实际线程数、warp 数、线性层调用数和各线程完成的输出列数。默认 8 个线程完成 42 次并行线性层调用，使用一个工作组、一个 GPU 核。

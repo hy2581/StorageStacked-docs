@@ -19,6 +19,7 @@
 | [llm/src/tinyllm.cpp.md](llm/src/tinyllm.cpp.md) | NPU 字符 Transformer |
 | [llm/src/tinyllm.h.md](llm/src/tinyllm.h.md) | 模型结构、权重和布局 |
 | [llm/result/README.md](llm/result/README.md) | 生成输出按文件类型解释 |
+| [burst/README.md](burst/README.md) | 原生 16 字节请求的 1/2/4/8/16 拍 AXI、掩码与边界检查 |
 
 ## 运行顺序
 
@@ -57,4 +58,4 @@ flowchart TD
 | `project_config.h` | 否 | 构建器根据 JSON 自动生成 |
 | `result/某次运行/` | 否 | 每次运行的快照、产物与检查记录 |
 
-具体可复制的实验命令见 [原项目配置实验](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/docs/05-%E9%85%8D%E7%BD%AE%E5%AE%9E%E9%AA%8C%E4%B8%8EUSER%E8%B4%9F%E8%BD%BD%E8%AF%A6%E8%A7%A3.md)。
+具体可复制的实验命令见 [原项目配置实验](https://github.com/hy2581/coralnpu_StorageStacked/blob/b90c7140d2717ee0a0dbec8308ae3488510b9acf/docs/05-%E9%85%8D%E7%BD%AE%E5%AE%9E%E9%AA%8C%E4%B8%8EUSER%E8%B4%9F%E8%BD%BD%E8%AF%A6%E8%A7%A3.md)。

@@ -1,6 +1,6 @@
 # config.json：这次运行选什么参数
 
-对应原文件：[coralnpu_StorageStacked/user/llm/config.json](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/user/llm/config.json)。
+对应原文件：[coralnpu_StorageStacked/user/llm/config.json](https://github.com/hy2581/coralnpu_StorageStacked/blob/b90c7140d2717ee0a0dbec8308ae3488510b9acf/user/llm/config.json)。
 
 在这里设置输入文字、生成长度、KV cache，以及设备和存储的运行参数。
 
@@ -23,6 +23,7 @@
 | `npu.clock_mhz` | `500` | CoralNPU 时钟频率，单位 MHz。 |
 | `axi.period_ns` | `2` | AXI 时钟周期，单位 ns；2 ns 对应 500 MHz。 |
 | `axi.outstanding` | `16` | 桥接器允许同时在途的请求数；不是 GPU 线程数。 |
+| `axi.burst_beats` | `4` | 一个原生 16 字节请求的 AXI INCR burst 拍数，可取 1、2、4、8、16。 |
 | `axi.planes` | `2` | AoU 链路资源 plane 数量；不是 LLM 内存区域数或 MEMSIM 通道数。 |
 | `axi.stalls` | `true` | 启用可重复的等待/背压，检查 AXI 握手和通道独立性。 |
 | `axi.replay` | `false` | 开启后注入可重复的物理 flit 错误，运行链路重传检查。 |
@@ -97,5 +98,5 @@ LLM 先保持 `prompt="red "` 和生成 3 个字符，只把 `kv_cache` 改为 f
 `program.type` 必须与源程序使用的宏和检查约定匹配。
 例如 smoke 用 `SMOKE_INPUT`，custom 的 `defines.INPUT` 生成的是 `APP_INPUT`。
 
-更完整的字段限制由 [当前 configure.py](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/coralnpu/runtime/configure.py) 检查。
+更完整的字段限制由 [当前 configure.py](https://github.com/hy2581/coralnpu_StorageStacked/blob/b90c7140d2717ee0a0dbec8308ae3488510b9acf/coralnpu/runtime/configure.py) 检查。
 prompt 的词表检查还在模型编译步骤中进行，不能只通过 JSON 语法就算输入可运行。

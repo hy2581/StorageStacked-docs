@@ -1,6 +1,6 @@
 # build.sh：第一次构建和重新构建
 
-对应原文件：[coralnpu_StorageStacked/build.sh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/build.sh)。
+对应原文件：[coralnpu_StorageStacked/build.sh](https://github.com/hy2581/coralnpu_StorageStacked/blob/b90c7140d2717ee0a0dbec8308ae3488510b9acf/build.sh)。
 
 运行 `build.sh` 会检查公共存储项目的位置，准备仿真平台，再编译自带的用户程序。
 
@@ -28,7 +28,7 @@
 ## 内部构建负责什么
 
 检查公共 AXI 项目、保存相对路径设置、准备编译工具、构建平台，再编译 smoke 和 llm。
-路径变更时会处理相关可重建缓存。加入 `--test` 后继续执行回归；普通构建完成后，用户通过 `user/run.sh` 选择运行项目。
+路径变更时会处理相关可重建缓存。加入 `--test` 后执行一次平台回归，SMOKE 和 LLM 的默认场景各运行一次；普通构建完成后，用户通过 `user/run.sh` 选择运行项目。
 
 这层入口的职责是整理构建环境和日志。每个用户项目具体编译哪些源码，由其 `src/Makefile` 决定。
 
@@ -87,3 +87,5 @@ cd user
 
 工具还没准备齐时，离线开关不能凭空补齐依赖。
 首次准备环境与日常重跑的工作量不同；应按报错定位缺少的工具或文件。
+
+设备构建固定启用 RVV，使用 `RvvCoreMiniAxi`；LLM 的线性层执行 RVV FP32 运算。

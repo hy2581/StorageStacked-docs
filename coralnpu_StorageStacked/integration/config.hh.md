@@ -1,13 +1,13 @@
 # config.hh：仿真参数从哪里来
 
-对应原文件：[coralnpu_StorageStacked/integration/config.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/02d3644d126d96d0da52f368ff75ec61d62b4f57/integration/config.hh)。
+对应原文件：[coralnpu_StorageStacked/integration/config.hh](https://github.com/hy2581/coralnpu_StorageStacked/blob/b90c7140d2717ee0a0dbec8308ae3488510b9acf/integration/config.hh)。
 
 `ConfigParams` 把 NPU、AXI 和存储的设置放在一起，供仿真程序读取。
 
 ## 结构关系
 
 `ConfigParams` 继承公共项目的 `StorageConfig`，因此同时具有存储地址窗口、链路资源和 MEMSIM 参数。
-本文件只新增 NPU 驱动所需的时钟、超时、在途容量和 ELF 路径。
+本文件新增 NPU 驱动所需的时钟、超时、在途容量、burst 拍数和 ELF 路径。
 main.cc 读取本次 resolved.json 后填入这些字段，再传给 Demo 与 Master。
 
 ## 本文件新增字段
@@ -18,6 +18,7 @@ main.cc 读取本次 resolved.json 后填入这些字段，再传给 Demo 与 Ma
 | `device_period` | 2000000 fs | NPU 时钟周期，默认对应 500 MHz |
 | `max_ticks` | 20000000000000 fs | 最大仿真时间 |
 | `outstanding` | 16 | 桥接器最大在途请求数 |
+| `burst_beats` | 4 | 每个原生 16 字节请求的 INCR burst 拍数；可取 1、2、4、8、16 |
 | `stalls` | true | 启用确定性等待与背压 |
 | `kernel` | 空字符串 | 本次用户 program.elf 的路径 |
 

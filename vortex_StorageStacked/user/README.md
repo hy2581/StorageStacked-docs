@@ -19,6 +19,7 @@
 | [llm/src/Makefile.md](llm/src/Makefile.md) | 声明源码和公共编译规则 |
 | [llm/src/host.cpp.md](llm/src/host.cpp.md) | GEM5 CPU 主机程序及多线程工作 |
 | [llm/src/kernel.cpp.md](llm/src/kernel.cpp.md) | Vortex GPU 计算程序 |
+| [llm/src/llm_parallel.h.md](llm/src/llm_parallel.h.md) | GPU 共享局部内存与各线程工作量 |
 | [llm/src/tinyllm.h.md](llm/src/tinyllm.h.md) | 模型结构、权重和布局 |
 | [llm/result/README.md](llm/result/README.md) | 生成输出按文件类型解释 |
 
@@ -60,4 +61,4 @@ flowchart TD
 | `project_config.h` | 否 | 构建器根据 JSON 自动生成 |
 | `result/某次运行/` | 否 | 每次运行的快照、产物与检查记录 |
 
-具体可复制的实验命令见 [原项目配置实验](https://github.com/hy2581/vortex_StorageStacked/blob/2014e742e88dcd2d8209c4ddb86c0d6c2d0ce5c2/docs/06-%E9%85%8D%E7%BD%AE%E5%AE%9E%E9%AA%8C%E4%B8%8EUSER%E8%B4%9F%E8%BD%BD%E8%AF%A6%E8%A7%A3.md)。
+具体可复制的实验命令见 [原项目配置实验](https://github.com/hy2581/vortex_StorageStacked/blob/977cfe8acb737d2f99a6304135a861ba8112ca9c/docs/06-%E9%85%8D%E7%BD%AE%E5%AE%9E%E9%AA%8C%E4%B8%8EUSER%E8%B4%9F%E8%BD%BD%E8%AF%A6%E8%A7%A3.md)。
